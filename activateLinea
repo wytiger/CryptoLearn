@@ -1,0 +1,85 @@
+import requests
+from web3 import Web3
+
+def __init__(self):
+    self.headers = {
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Content-Length": "79",
+        "Content-Type": "application/json",
+        "Cookie": "",
+        "Origin": "https://referrals.linea.build",
+        "Priority": "u=1, i",
+        "Referer": "https://referrals.linea.build/",
+        "Sec-Ch-Ua": '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    }
+
+def nonce(address): 
+    url = "https://referrals-api.sepolia.linea.build/nonce"
+    response = requests.get(url)
+    print(response.status_code)
+    print(response.text)
+    print("******")
+    return response.text
+
+
+def verify(address,nonce): 
+    rpc="https://rpc.linea.build"
+    web3 = Web3(Web3.HTTPProvider(rpc))
+    data = "referrals.linea.build wants you to sign in with your Ethereum account:\n{address}\n\nVerify wallet ownership for the Linea Surge Referrals\n\nURI: https://referrals.linea.build\nVersion: 1\nChain ID: 59144\nNonce: {nonce}\nIssued At: 2024-06-04T15:51:29.584Z"
+    privateKeyBytes = str.encode('privateKey')
+    sign = web3.eth.accounts.sign(data, privateKeyBytes)
+    print(sign)
+
+    url = "https://referrals-api.sepolia.linea.build/verify"
+    body = {
+        "message": "referrals.linea.build wants you to sign in with your Ethereum account:\n{address}\n\nVerify wallet ownership for the Linea Surge Referrals\n\nURI: https://referrals.linea.build\nVersion: 1\nChain ID: 59144\nNonce: {nonce}\nIssued At: 2024-06-04T14:56:01.989Z",
+        "signature": "{sign}"
+    }
+
+    response = requests.post(url,json=body)
+
+    print(response.status_code)
+    print(response.json())
+    print("******")
+
+
+
+def activate(address): 
+    url = "https://referrals-api.sepolia.linea.build/activate"
+
+    body = {
+        "address": address,
+        "refCode": "nUgPNdSAaY"
+    }
+
+    response = requests.post(url,json=body)
+
+    print(response.status_code)
+    print(response.json())
+    print("******")
+
+
+def main():
+    f = open('account.txt', 'r', encoding='utf-8')
+    accounts = f.readlines()
+    f.close()
+    
+    for idx, account in enumerate(accounts):      
+        non = nonce(account)
+        verify(account,non)
+        activate(account)
+        print("---------------------")
+
+
+main()
+
+
