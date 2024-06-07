@@ -50,7 +50,7 @@ class Linea:
     def query(self,address): 
         url = "https://referrals-api.sepolia.linea.build/query/{addr}".format(addr = address)
         response = requests.get(url, headers=self.headers,cookies=self.cookies)
-        self.cookies = response.cookies
+        self.cookies.update(response.cookies)
         print(response.status_code)
         print(response.json())
         print("***********************************************")
@@ -60,7 +60,7 @@ class Linea:
     def nonce(self,address): 
         url = "https://referrals-api.sepolia.linea.build/nonce"
         response = requests.get(url, headers=self.headers,cookies=self.cookies)
-        self.cookies = response.cookies
+        self.cookies.update(response.cookies)
         print(response.status_code)
         print(response.text)
         print("***********************************************")
@@ -92,7 +92,7 @@ class Linea:
         }
 
         response = requests.post(url, headers=self.headers,cookies=self.cookies,json=body)
-        self.cookies = response.cookies
+        self.cookies.update(response.cookies)
 
         print(response.status_code)
         print(response.json())
@@ -101,7 +101,7 @@ class Linea:
     def me(self,address): 
         url = "https://referrals-api.sepolia.linea.build/me"
         response = requests.get(url, headers=self.headers,cookies=self.cookies)
-        self.cookies = response.cookies
+        self.cookies.update(response.cookies)
 
         print(response.status_code)
         print(response.json())
@@ -119,7 +119,7 @@ class Linea:
         }
 
         response = requests.post(url, headers=self.headers,cookies=self.cookies,json=body)
-        self.cookies = response.cookies
+        self.cookies.update(response.cookies)
 
         print(response.status_code)
         print(response.json())
@@ -139,12 +139,9 @@ def main():
             address = account.address
 
             linea = Linea()
-            #前置请求
-            linea.initHttp(address)
-            linea.me(address)  
+            #前置请求    
             linea.initHttp(address)
             linea.query(address)     
-            linea.me(address)  
             non = linea.nonce(address)
             linea.verify(web3,address,private_key,non)
             linea.me(address)
